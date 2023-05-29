@@ -1,0 +1,30 @@
+name: simple_site CI check
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  nginx_test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Build and run Nginx container
+      run: |
+        docker build -t nginx_test ./ci
+        docker run -d -p 8080:80 nginx_test
+
+    - name: Check all HTML files
+      run: |
+        sleep 5  # Allow some time for the Nginx server to start
+        for html_file in $(find . -name "*.html"); do
+          status_code=$(curl --write-out %{http_code} --silent --output /dev/null http://localhost:8080/$html_file)
+          if [[ "$status_code" -ne 200 ]] ; then
+            echo "Page $html_file returned status: $status_code"
+            exit 1
+          fi
+        done

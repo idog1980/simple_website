@@ -20,7 +20,7 @@ jobs:
 
     - name: Check all HTML files
       run: |
-        sleep 5  # Allow some time for the Nginx server to start
+        sleep 10  # Allow some time for the Nginx server to start
         for html_file in $(find . -name "*.html"); do
           status_code=$(curl --write-out %{http_code} --silent --output /dev/null http://localhost:8080/$html_file)
           if [[ "$status_code" -ne 200 ]] ; then

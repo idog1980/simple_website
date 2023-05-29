@@ -18,15 +18,18 @@ jobs:
         docker build -t nginx_test ./ci
         docker run -d -p 8080:80 nginx_test
 
-    - name: Check all HTML files
+    - name: Check if Nginx is alive
       run: |
-       sleep 5  # Allow some time for the Nginx server to start
-       status_code=$(curl --write-out %{http_code} --silent --output /dev/null http://localhost:8080)
+        sleep 5  # Allow some time for the Nginx server to start
+        status_code=$(curl --write-out %{http_code} --silent --output /dev/null http://localhost:8080)
         if [[ "$status_code" -ne 200 ]] ; then
           echo "Nginx is not accessible at localhost:8080 (returned status: $status_code)"
           exit 1
         fi
-       for html_file in $(find . -name "*.html" | sed 's|^\./||'); do
+
+    - name: Check all HTML files
+      run: |
+      for html_file in $(find . -name "*.html" | sed 's|^\./||'); do
         status_code=$(curl --write-out %{http_code} --silent --output /dev/null http://localhost:8080/$html_file)
         if [[ "$status_code" -ne 200 ]] ; then
           echo "Page $html_file returned status: $status_code"

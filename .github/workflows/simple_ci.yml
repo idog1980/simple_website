@@ -15,7 +15,7 @@ jobs:
 
     - name: Build and run Nginx container
       run: |
-        docker build -t nginx_test ./ci
+        docker build -t nginx_test -f ci/Dockerfile .
         docker run -d -p 8080:80 nginx_test
 
     - name: Check all HTML files
